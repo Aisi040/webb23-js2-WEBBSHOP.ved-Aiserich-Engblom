@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
@@ -7,6 +7,11 @@ import './Product.css';
 function Product({ product, onAddToCart, onUpdateStock, showStockInfo }) {
   const imageUrl = product.image || 'standard-bild-url'; // Ersätt 'standard-bild-url' med den faktiska URL:en till din standardbild
   const [addingToCart, setAddingToCart] = useState(false);
+  const [stock, setStock] = useState(product.stock);
+
+  useEffect(() => {
+    setStock(product.stock);
+  }, [product.stock]);
 
   const addToCart = async () => {
     try {
@@ -17,7 +22,9 @@ function Product({ product, onAddToCart, onUpdateStock, showStockInfo }) {
       });
       if (result.status === 200) {
         onAddToCart(product);
-        onUpdateStock(product.id, product.stock - 1); // Uppdatera lagersaldot
+        const newStock = stock - 1;
+        setStock(newStock);
+        onUpdateStock(product.id, newStock);
       }
       setAddingToCart(false);
     } catch (error) {
@@ -33,7 +40,7 @@ function Product({ product, onAddToCart, onUpdateStock, showStockInfo }) {
         alt={product.name}
         className="card-img-top"
         onError={(e) => {
-          e.target.src = 'fallback-image-url'; 
+          e.target.src = 'fallback-image-url'; // Ersätt 'fallback-image-url' med den faktiska URL:en till din fallback-bild
           e.target.alt = 'Bild saknas';
         }}
       />
@@ -48,11 +55,11 @@ function Product({ product, onAddToCart, onUpdateStock, showStockInfo }) {
         <p className="card-text">
           <strong>{product.price} kr</strong>
         </p>
-        {product.stock > 0 ? (
+        {stock > 0 ? (
           <div>
             {showStockInfo && (
               <p className="card-text">
-                Antal i lager: {product.stock}
+                Antal i lager: {stock}
               </p>
             )}
             <button
@@ -83,7 +90,7 @@ function Product({ product, onAddToCart, onUpdateStock, showStockInfo }) {
 
 Product.propTypes = {
   product: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     image: PropTypes.string,
     name: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
@@ -93,11 +100,11 @@ Product.propTypes = {
   }).isRequired,
   onAddToCart: PropTypes.func.isRequired,
   onUpdateStock: PropTypes.func.isRequired,
-  showStockInfo: PropTypes.bool, // Ny prop för att styra visning av lagerstatus
+  showStockInfo: PropTypes.bool,
 };
 
 Product.defaultProps = {
-  showStockInfo: true,  // Visa lagerinfo som standard
+  showStockInfo: true,
 };
 
 export default Product;
