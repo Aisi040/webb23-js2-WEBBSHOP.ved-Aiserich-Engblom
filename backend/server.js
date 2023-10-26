@@ -7,7 +7,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3001',
+  origin: 'http://localhost:3001', // Byt ut mot din frontend-serverns adress
   methods: 'GET,POST',
   allowedHeaders: 'Content-Type'
 }));
@@ -20,7 +20,6 @@ async function readProducts() {
     return JSON.parse(data);
   } catch (err) {
     console.error('Error reading products file:', err);
-    // Returnera en tom lista om det inte finns några produkter
     return [];
   }
 }
@@ -40,15 +39,36 @@ app.get('/', (req, res) => {
 
 app.get('/products', async (req, res, next) => {
   try {
+    const { search } = req.query;
     const products = await readProducts();
-    res.json(products);
+    const filteredProducts = search
+      ? products.filter((product) =>
+          product.name.toLowerCase().includes(search.toLowerCase())
+        )
+      : products;
+    res.json(filteredProducts);
   } catch (err) {
     next(err);
   }
 });
 
 app.post('/purchase', async (req, res, next) => {
-  // ... kod för att hantera köp ...
+  try {
+    const { products: purchasedProducts } = req.body;
+    const allProducts = await readProducts();
+
+    purchasedProducts.forEach((purchasedProduct) => {
+      const product = allProducts.find(p => p.id === purchasedProduct.id);
+      if (product) {
+        product.stock = Math.max(0, product.stock - purchasedProduct.quantity);
+      }
+    });
+
+    await writeProducts(allProducts);
+    res.json({ success: true, message: 'Köp genomfört, lager uppdaterat' });
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.post('/update-inventory', async (req, res, next) => {
@@ -56,19 +76,14 @@ app.post('/update-inventory', async (req, res, next) => {
     const { productId, quantity } = req.body;
     const products = await readProducts();
 
-    const updatedProducts = products.map((product) => {
-      if (product.id === productId) {
-        const updatedStock = product.stock - quantity;
-        if (updatedStock < 0) {
-          return { ...product, stock: 0 };
-        }
-        return { ...product, stock: updatedStock };
-      }
-      return product;
-    });
-
-    await writeProducts(updatedProducts);
-    res.json({ success: true, message: 'Lager uppdaterat' });
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      product.stock = Math.max(0, product.stock - quantity);
+      await writeProducts(products);
+      res.json({ success: true, message: 'Lager uppdaterat' });
+    } else {
+      res.status(404).json({ success: false, message: 'Produkten hittades inte' });
+    }
   } catch (err) {
     console.error('Error updating inventory:', err);
     next(err);
