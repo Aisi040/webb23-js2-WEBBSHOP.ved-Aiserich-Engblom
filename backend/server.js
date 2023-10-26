@@ -14,23 +14,14 @@ app.use(cors({
 
 const productsFilePath = path.join(__dirname, 'data', 'products.json');
 
-const defaultProducts = [
-  { id: 1, name: 'Djupskogsveden', price: 1800, isBestseller: false, description: 'En blandning av björk, ek och ask. Perfekt för kalla vinterkvällar och ger en behaglig doft.' },
-  { id: 2, name: 'Lugna nätter', price: 1500, isBestseller: true, description: 'Vår mest prisvärda ved, ett bra val för den som vill ha bra värde för pengarna.' },
-  { id: 3, name: 'Premium Ek', price: 2200, isBestseller: true, description: 'Vår premium ekved ger mycket värme och har en lång brinntid.' },
-  { id: 4, name: 'Björkved Deluxe', price: 2000, isBestseller: false, description: 'Björkved av hög kvalitet, väljer du detta kan du inte gå fel.' },
-  { id: 5, name: 'Ask och Björk', price: 1700, isBestseller: false, description: 'En blandning av ask och björk, ger en jämn och fin brasa.' },
-  { id: 6, name: 'Sommarkväll', price: 1600, isBestseller: true, description: 'Perfekt för en sommarkväll vid eldstaden eller eldkorgen.' }
-];
-
 async function readProducts() {
   try {
     const data = await fs.readFile(productsFilePath, 'utf8');
     return JSON.parse(data);
   } catch (err) {
     console.error('Error reading products file:', err);
-    // Om filen inte finns, returnera standardprodukterna
-    return defaultProducts;
+    // Returnera en tom lista om det inte finns några produkter
+    return [];
   }
 }
 
@@ -49,13 +40,8 @@ app.get('/', (req, res) => {
 
 app.get('/products', async (req, res, next) => {
   try {
-    const { query } = req;
     const products = await readProducts();
-    let filteredProducts = products;
-
-    // ... kod för att filtrera produkter ...
-
-    res.json(filteredProducts);
+    res.json(products);
   } catch (err) {
     next(err);
   }
@@ -65,27 +51,23 @@ app.post('/purchase', async (req, res, next) => {
   // ... kod för att hantera köp ...
 });
 
-// Lägg till en API-rutt för att uppdatera lagerantalet
 app.post('/update-inventory', async (req, res, next) => {
   try {
     const { productId, quantity } = req.body;
     const products = await readProducts();
 
-    // Här bör du implementera logiken för att uppdatera lagret
-    // baserat på productId och quantity.
-
-    // Exempel: Hitta rätt produkt och dra av antalet från lagret.
     const updatedProducts = products.map((product) => {
       if (product.id === productId) {
-        const updatedProduct = { ...product };
-        updatedProduct.inventory -= quantity;
-        return updatedProduct;
+        const updatedStock = product.stock - quantity;
+        if (updatedStock < 0) {
+          return { ...product, stock: 0 };
+        }
+        return { ...product, stock: updatedStock };
       }
       return product;
     });
 
     await writeProducts(updatedProducts);
-
     res.json({ success: true, message: 'Lager uppdaterat' });
   } catch (err) {
     console.error('Error updating inventory:', err);

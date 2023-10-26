@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios'; // Importera Axios
+import axios from 'axios';
 
-import './Product.css'; // Importera din CSS-fil här
+import './Product.css';
 
-function Product({ product, onAddToCart }) {
-  const imageUrl = product.image || 'standard-bild-url'; // Lägg till URL för standardbild här
-  const [addingToCart, setAddingToCart] = useState(false); // State för att hantera tillägg i kundvagnsstatus
+function Product({ product, onAddToCart, onUpdateStock, showStockInfo }) {
+  const imageUrl = product.image || 'standard-bild-url'; // Ersätt 'standard-bild-url' med den faktiska URL:en till din standardbild
+  const [addingToCart, setAddingToCart] = useState(false);
 
-  // Funktion för att göra API-anrop när en produkt läggs till i kundvagnen
   const addToCart = async () => {
     try {
-      setAddingToCart(true); // Uppdatera tillägg i kundvagnsstatus till true
-      await axios.post('http://localhost:3000/update-inventory', {
+      setAddingToCart(true);
+      const result = await axios.post('http://localhost:3000/update-inventory', {
         productId: product.id,
-        quantity: 1, // Antal att ta bort från lagret (1 st i detta fall)
+        quantity: 1,
       });
-      onAddToCart(product); // Lägg till produkten i kundvagnen (uppdatera din kundvagnslogik här)
-      setAddingToCart(false); // Återställ tillägg i kundvagnsstatus till false
+      if (result.status === 200) {
+        onAddToCart(product);
+        onUpdateStock(product.id, product.stock - 1); // Uppdatera lagersaldot
+      }
+      setAddingToCart(false);
     } catch (error) {
       console.error('Error adding to cart:', error);
-      setAddingToCart(false); // Återställ tillägg i kundvagnsstatus till false om det uppstod ett fel
+      setAddingToCart(false);
     }
   };
 
@@ -31,9 +33,9 @@ function Product({ product, onAddToCart }) {
         alt={product.name}
         className="card-img-top"
         onError={(e) => {
-          e.target.src = 'fallback-image-url';
+          e.target.src = 'fallback-image-url'; // Ersätt 'fallback-image-url' med den faktiska URL:en till din fallback-bild
           e.target.alt = 'Bild saknas';
-        }} // Fallback för bild
+        }}
       />
       {product.isBestseller && (
         <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
@@ -48,13 +50,15 @@ function Product({ product, onAddToCart }) {
         </p>
         {product.stock > 0 ? (
           <div>
-            <p className="card-text">
-              Antal i lager: {product.stock}
-            </p>
+            {showStockInfo && (
+              <p className="card-text">
+                Antal i lager: {product.stock}
+              </p>
+            )}
             <button
-              onClick={addToCart} // Anropa addToCart-funktionen när knappen klickas
+              onClick={addToCart}
               className="btn btn-primary mt-2"
-              disabled={addingToCart} // Inaktivera knappen om produkten läggs till i kundvagnen
+              disabled={addingToCart}
             >
               {addingToCart ? 'Lägger till...' : 'Lägg till i kundvagn'}
             </button>
@@ -65,9 +69,8 @@ function Product({ product, onAddToCart }) {
               Produkten är tyvärr slut i lager.
             </p>
             <button
-              onClick={addToCart} // Anropa addToCart-funktionen när knappen klickas
               className="btn btn-secondary mt-2"
-              disabled={true} // Inaktivera knappen om produkten inte finns i lager
+              disabled={true}
             >
               Lägg till i kundvagn
             </button>
@@ -80,14 +83,21 @@ function Product({ product, onAddToCart }) {
 
 Product.propTypes = {
   product: PropTypes.shape({
+    id: PropTypes.string.isRequired,
     image: PropTypes.string,
     name: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
     isBestseller: PropTypes.bool,
-    stock: PropTypes.number.isRequired, // Lägg till stock i propTypes
+    stock: PropTypes.number.isRequired,
   }).isRequired,
   onAddToCart: PropTypes.func.isRequired,
+  onUpdateStock: PropTypes.func.isRequired,
+  showStockInfo: PropTypes.bool, // Ny prop för att styra visning av lagerstatus
+};
+
+Product.defaultProps = {
+  showStockInfo: true,  // Visa lagerinfo som standard
 };
 
 export default Product;
