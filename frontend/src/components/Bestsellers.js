@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 function Bestsellers({ products, onAddToCart, onUpdateStock }) {
   const bestsellers = products
     .filter(product => product.isBestseller)
-    .slice(0, 3); // Hämta endast de tre första bästsäljande produkterna
+    .slice(0, 3); // Hämta tre bästsäljande produkterna
 
   const textStyle = {
     backgroundColor: 'rgba(255, 255, 255, 0.4)', 

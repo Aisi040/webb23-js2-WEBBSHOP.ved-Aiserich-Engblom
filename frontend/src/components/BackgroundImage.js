@@ -9,7 +9,7 @@ function BackgroundImage() {
     backgroundRepeat: 'no-repeat',
     width: '500px',
     height: '610px',
-    position: 'absolute', // Ändrat från 'fixed' till 'absolute'
+    position: 'absolute', 
     bottom: '-300px',
     right: '5px',
     zIndex: -1,
@@ -17,14 +17,14 @@ function BackgroundImage() {
     justifyContent: 'center',
     alignItems: 'flex-start',
     padding: '20px',
-    opacity: 0.8,  // Gör bilden lite genomskinlig
+    opacity: 0.8,  // genomskinlig
   };
 
   const textStyle = {
     color: 'white',
     fontSize: '19px',
-    marginTop: '80px',  // Minskat ner från 100px för att flytta texten uppåt
-    marginLeft: '10px', // Lägg till för att flytta texten lite åt vänster
+    marginTop: '80px',  
+    marginLeft: '10px', 
     textAlign: 'left',
     lineHeight: '1.5',
   

@@ -6,7 +6,7 @@
     "isBestseller": false,
     "description": "En blandning av björk, ek och ask. Perfekt för kalla vinterkvällar och ger en behaglig doft.",
     "stock": 10,
-    "inventory": -17
+    "inventory": -18
   },
   {
     "id": 2,
@@ -15,7 +15,7 @@
     "isBestseller": true,
     "description": "Vår mest prisvärda ved, ett bra val för den som vill ha bra värde för pengarna.",
     "stock": 25,
-    "inventory": -37
+    "inventory": -40
   },
   {
     "id": 3,
@@ -24,7 +24,7 @@
     "isBestseller": true,
     "description": "Vår premium ekved ger mycket värme och har en lång brinntid.",
     "stock": 7,
-    "inventory": -20
+    "inventory": -21
   },
   {
     "id": 4,
@@ -42,7 +42,7 @@
     "isBestseller": false,
     "description": "En blandning av ask och björk, ger en jämn och fin brasa.",
     "stock": 8,
-    "inventory": -2
+    "inventory": -4
   },
   {
     "id": 6,

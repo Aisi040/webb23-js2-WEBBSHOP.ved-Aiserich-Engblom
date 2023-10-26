@@ -16,11 +16,12 @@ function App() {
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/products'); // Byt ut mot din backend-URL
+        const response = await axios.get('http://localhost:3000/products'); 
         setProducts(response.data);
       } catch (error) {
         setError('Det gick inte att hämta produkterna');
@@ -45,20 +46,28 @@ function App() {
     setCart([]); // Clear the cart after purchase
   };
 
+  const handleSearch = term => {
+    setSearchTerm(term.toLowerCase());
+  };
+
+  const filteredProducts = products.filter(product => 
+    product.name.toLowerCase().includes(searchTerm) ||
+    product.description.toLowerCase().includes(searchTerm)
+  );
+
   return (
     <Router>
-      <Header cartCount={cart.length} />
+      <Header cartCount={cart.length} onSearch={handleSearch} />
       <div className="container mt-4" style={{ minHeight: '100vh' }}>
         <Routes>
-          <Route path="/" element={error ? <p>{error}</p> : <HomePage products={products} onAddToCart={handleAddToCart} />} />
-          <Route path="/produkter" element={error ? <p>{error}</p> : <ProductList products={products} onAddToCart={handleAddToCart} />} />
+          <Route path="/" element={error ? <p>{error}</p> : <HomePage products={filteredProducts} onAddToCart={handleAddToCart} />} />
+          <Route path="/produkter" element={error ? <p>{error}</p> : <ProductList products={filteredProducts} onAddToCart={handleAddToCart} />} />
           <Route path="/kundvagn" element={<ShoppingCart cart={cart} onRemoveFromCart={handleRemoveFromCart} onCheckout={handleCheckout} />} />
           <Route path="/kontakt" element={<ContactPage />} />
-          {/* Lägg till fler Routes här om du vill */}
         </Routes>
       </div>
       <div style={{ minHeight: '200px' }}>
-        {/* Extra utrymme för att möjliggöra scrolling */}
+        {/*scrolling */}
       </div>
       <BackgroundImage />
       <Footer />

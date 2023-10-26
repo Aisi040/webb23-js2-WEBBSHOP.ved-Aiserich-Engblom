@@ -33,7 +33,7 @@ function Product({ product, onAddToCart, onUpdateStock, showStockInfo }) {
         alt={product.name}
         className="card-img-top"
         onError={(e) => {
-          e.target.src = 'fallback-image-url'; // Ersätt 'fallback-image-url' med den faktiska URL:en till din fallback-bild
+          e.target.src = 'fallback-image-url'; 
           e.target.alt = 'Bild saknas';
         }}
       />

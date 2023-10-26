@@ -2,8 +2,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import CartIcon from './CartIcon';
+import SearchBar from './SearchBar';
 
-function Header({ cartCount }) {
+function Header({ cartCount, onSearch }) {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
@@ -12,7 +13,7 @@ function Header({ cartCount }) {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav">
+          <ul className="navbar-nav me-auto">
             <li className="nav-item">
               <Link className="nav-link" to="/">Hem</Link>
             </li>
@@ -26,6 +27,7 @@ function Header({ cartCount }) {
               <Link className="nav-link" to="/kontakt">Kontakt</Link>
             </li>
           </ul>
+          <SearchBar onSearch={onSearch} />
         </div>
         <Link to="/kundvagn" className="nav-link">
           <CartIcon cartCount={cartCount} />
