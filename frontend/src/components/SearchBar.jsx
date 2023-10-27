@@ -1,6 +1,7 @@
+// SearchBar.jsx
 import React, { useState } from 'react';
 
-function SearchBar({ onSearch }) {
+function SearchBar({ onSearch, onSort }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleChange = (e) => {
@@ -8,13 +9,23 @@ function SearchBar({ onSearch }) {
     onSearch(e.target.value);
   };
 
+  const handleSortChange = (e) => {
+    onSort(e.target.value);
+  };
+
   return (
-    <input
-      type="text"
-      placeholder="Sök..."
-      value={searchTerm}
-      onChange={handleChange}
-    />
+    <div>
+      <input
+        type="text"
+        placeholder="Sök..."
+        value={searchTerm}
+        onChange={handleChange}
+      />
+      <select onChange={handleSortChange} defaultValue="lowest">
+        <option value="lowest">Lägsta pris först</option>
+        <option value="highest">Högsta pris först</option>
+      </select>
+    </div>
   );
 }
 

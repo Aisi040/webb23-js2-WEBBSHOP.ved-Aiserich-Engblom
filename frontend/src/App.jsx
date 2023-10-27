@@ -10,24 +10,26 @@ import HomePage from './components/HomePage';
 import BackgroundImage from './components/BackgroundImage';
 import ContactPage from './components/ContactPage';
 import './style.css';
+import PropTypes from 'prop-types';
 
 function App() {
   const [cart, setCart] = useState([]);
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get('http://localhost:3000/products'); 
-      setProducts(response.data);
-    } catch (error) {
-      setError('Det gick inte att hämta produkterna');
-      console.error('Error fetching products:', error);
-    }
-  };
+  const [sortOrder, setSortOrder] = useState('lowest');
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/products'); 
+        setProducts(response.data);
+      } catch (error) {
+        setError('Det gick inte att hämta produkterna');
+        console.error('Error fetching products:', error);
+      }
+    };
+
     fetchProducts();
   }, []);
 
@@ -40,59 +42,56 @@ function App() {
     else setCart(cart.filter((_, i) => i !== index));
   };
 
-  const handleCheckout = async () => {
-    try {
-      const productQuantities = cart.reduce((acc, product) => {
-        acc[product.id] = (acc[product.id] || 0) + 1;
-        return acc;
-      }, {});
-
-      const purchasedProducts = Object.keys(productQuantities).map(id => ({
-        id,
-        quantity: productQuantities[id]
-      }));
-
-      const response = await axios.post('http://localhost:3000/purchase', { products: purchasedProducts });
-      if (response.data.success) {
-        alert('Köp genomfört!');
-        setCart([]); // Clear the cart after purchase
-        fetchProducts(); // Fetch products again to update the stock
-      } else {
-        alert('Kunde inte genomföra köpet: ' + response.data.message);
-      }
-    } catch (error) {
-      console.error('Error during purchase:', error);
-      alert('Ett fel uppstod vid köp.');
-    }
+  const handleCheckout = () => {
+    alert('Köp genomfört!');
+    setCart([]); // Clear the cart after purchase
   };
 
   const handleSearch = term => {
     setSearchTerm(term.toLowerCase());
   };
 
-  const filteredProducts = products.filter(product => 
-    product.name.toLowerCase().includes(searchTerm) ||
-    product.description.toLowerCase().includes(searchTerm)
-  );
+  const handleSort = order => {
+    setSortOrder(order);
+  };
+
+  const filteredAndSortedProducts = products
+    .filter(product => 
+      product.name.toLowerCase().includes(searchTerm) ||
+      product.description.toLowerCase().includes(searchTerm)
+    )
+    .sort((a, b) => {
+      if (sortOrder === 'lowest') {
+        return a.price - b.price;
+      } else {
+        return b.price - a.price;
+      }
+    });
 
   return (
     <Router>
-      <Header cartCount={cart.length} onSearch={handleSearch} />
+      <Header cartCount={cart.length} onSearch={handleSearch} onSort={handleSort} />
       <div className="container mt-4" style={{ minHeight: '100vh' }}>
         <Routes>
-          <Route path="/" element={error ? <p>{error}</p> : <HomePage products={filteredProducts} onAddToCart={handleAddToCart} />} />
-          <Route path="/produkter" element={error ? <p>{error}</p> : <ProductList products={filteredProducts} onAddToCart={handleAddToCart} />} />
+          <Route path="/" element={error ? <p>{error}</p> : <HomePage products={filteredAndSortedProducts} onAddToCart={handleAddToCart} />} />
+          <Route path="/produkter" element={error ? <p>{error}</p> : <ProductList products={filteredAndSortedProducts} onAddToCart={handleAddToCart} />} />
           <Route path="/kundvagn" element={<ShoppingCart cart={cart} onRemoveFromCart={handleRemoveFromCart} onCheckout={handleCheckout} />} />
           <Route path="/kontakt" element={<ContactPage />} />
         </Routes>
-      </div>
-      <div style={{ minHeight: '200px' }}>
-        {/* scrolling */}
       </div>
       <BackgroundImage />
       <Footer />
     </Router>
   );
 }
+
+App.propTypes = {
+  products: PropTypes.array,
+  cart: PropTypes.array,
+  error: PropTypes.string,
+  handleAddToCart: PropTypes.func,
+  handleRemoveFromCart: PropTypes.func,
+  handleCheckout: PropTypes.func,
+};
 
 export default App;
