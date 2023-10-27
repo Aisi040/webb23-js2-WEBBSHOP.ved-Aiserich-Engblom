@@ -5,7 +5,7 @@
     "price": 1500,
     "isBestseller": true,
     "description": "Vår mest prisvärda ved, ett bra val för den som vill ha bra värde för pengarna. Pris per m³",
-    "stock": 3,
+    "stock": 2,
     "inventory": 31
   },
   {
@@ -23,7 +23,7 @@
     "price": 2400,
     "isBestseller": false,
     "description": "Björkved av hög kvalitet, väljer du detta kan du inte gå fel. Pris per m³",
-    "stock": 14,
+    "stock": 13,
     "inventory": 50
   },
   {
