@@ -1,10 +1,9 @@
-// src/components/Header.js
 import React from 'react';
 import { Link } from 'react-router-dom';
 import CartIcon from './CartIcon';
 import SearchBar from './SearchBar';
 
-function Header({ cartCount, onSearch }) {
+function Header({ cartCount, onSearch, onSort }) {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
@@ -27,7 +26,7 @@ function Header({ cartCount, onSearch }) {
               <Link className="nav-link" to="/kontakt">Kontakt</Link>
             </li>
           </ul>
-          <SearchBar onSearch={onSearch} />
+          <SearchBar onSearch={onSearch} onSort={onSort} />
         </div>
         <Link to="/kundvagn" className="nav-link">
           <CartIcon cartCount={cartCount} />

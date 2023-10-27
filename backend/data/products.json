@@ -5,13 +5,13 @@
     "price": 1500,
     "isBestseller": true,
     "description": "Vår mest prisvärda ved, ett bra val för den som vill ha bra värde för pengarna. Pris per m³",
-    "stock": 16,
+    "stock": 11,
     "inventory": 31
   },
   {
     "id": 2,
     "name": "Djupskogsveden",
-    "price": 1800,
+    "price": 2100,
     "isBestseller": false,
     "description": "En blandning av björk, ek och ask. Perfekt för kalla vinterkvällar och ger en behaglig doft. Pris per m³",
     "stock": 0,
@@ -20,10 +20,10 @@
   {
     "id": 3,
     "name": "Björkved Deluxe",
-    "price": 2000,
+    "price": 2400,
     "isBestseller": false,
     "description": "Björkved av hög kvalitet, väljer du detta kan du inte gå fel. Pris per m³",
-    "stock": 21,
+    "stock": 20,
     "inventory": 50
   },
   {
@@ -32,7 +32,7 @@
     "price": 2000,
     "isBestseller": true,
     "description": "Perfekt för en sommarkväll vid eldstaden eller eldkorgen. Pris per m³",
-    "stock": 6,
+    "stock": 4,
     "inventory": 10
   },
   {

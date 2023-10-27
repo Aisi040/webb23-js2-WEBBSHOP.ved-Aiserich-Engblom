@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import './Product.css';
 
-function Product({ product, onAddToCart, onUpdateStock, showStockInfo }) {
+function Product({ product, onAddToCart, showStockInfo }) {
   const imageUrl = product.image || 'standard-bild-url'; // Ersätt 'standard-bild-url' med den faktiska URL:en till din standardbild
   const [addingToCart, setAddingToCart] = useState(false);
   const [stock, setStock] = useState(product.stock);
@@ -24,7 +24,6 @@ function Product({ product, onAddToCart, onUpdateStock, showStockInfo }) {
         onAddToCart(product);
         const newStock = stock - 1;
         setStock(newStock);
-        onUpdateStock(product.id, newStock);
       }
       setAddingToCart(false);
     } catch (error) {
@@ -99,7 +98,6 @@ Product.propTypes = {
     stock: PropTypes.number.isRequired,
   }).isRequired,
   onAddToCart: PropTypes.func.isRequired,
-  onUpdateStock: PropTypes.func.isRequired,
   showStockInfo: PropTypes.bool,
 };
 

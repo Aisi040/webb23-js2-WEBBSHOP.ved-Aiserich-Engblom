@@ -1,4 +1,3 @@
-// SearchBar.jsx
 import React, { useState } from 'react';
 
 function SearchBar({ onSearch, onSort }) {
