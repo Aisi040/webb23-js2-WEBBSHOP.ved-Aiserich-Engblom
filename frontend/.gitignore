@@ -1,0 +1,10 @@
+# Ignore development files
+node_modules/
+.vscode/
+.idea/
+
+# Ignore log files
+*.log
+/build/
+/public/
+package-lock.json
