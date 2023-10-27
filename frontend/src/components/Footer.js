@@ -4,7 +4,7 @@ import './Footer.css'; // Importera din CSS-fil för stilar
 function Footer() {
   return (
     <footer className="footer">
-      <p>&copy; {new Date().getFullYear()} Ditt Företagsnamn</p>
+      <p>&copy; {new Date().getFullYear()} VED</p>
       <p>Alla rättigheter förbehållna</p>
     </footer>
   );

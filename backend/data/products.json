@@ -6,7 +6,7 @@
     "isBestseller": true,
     "description": "Vår mest prisvärda ved, ett bra val för den som vill ha bra värde för pengarna. Pris per m³",
     "stock": 25,
-    "inventory": -20
+    "inventory": -23
   },
   {
     "id": 2,
@@ -15,7 +15,7 @@
     "isBestseller": false,
     "description": "En blandning av björk, ek och ask. Perfekt för kalla vinterkvällar och ger en behaglig doft. Pris per m³",
     "stock": 10,
-    "inventory": -19
+    "inventory": -28
   },
   {
     "id": 3,
@@ -42,7 +42,7 @@
     "isBestseller": false,
     "description": "En blandning av ask och björk, ger en jämn och fin brasa. Pris per m³",
     "stock": 8,
-    "inventory": -4
+    "inventory": -6
   },
   {
     "id": 6,

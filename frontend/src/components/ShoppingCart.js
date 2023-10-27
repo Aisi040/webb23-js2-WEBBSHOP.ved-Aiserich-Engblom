@@ -8,7 +8,7 @@ function ShoppingCart({ cart, onRemoveFromCart, onCheckout }) {
     padding: '20px',
     borderRadius: '10px',
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
-  };
+  }; 
 
   return (
     <div style={cartStyle}>
