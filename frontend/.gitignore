@@ -1,10 +1,12 @@
-# Ignore development files
-node_modules/
-.vscode/
-.idea/
+# Ignore node_modules directory
+/node_modules
 
 # Ignore log files
 *.log
-/build/
-/public/
+
+# Ignore development files and directories
+.vscode/
+.idea/
+build/
+public/
 package-lock.json
