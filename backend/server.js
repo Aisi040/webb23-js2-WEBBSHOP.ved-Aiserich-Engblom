@@ -57,35 +57,27 @@ app.post('/purchase', async (req, res, next) => {
     const { products: purchasedProducts } = req.body;
     const allProducts = await readProducts();
 
+    const outOfStock = purchasedProducts.filter(purchasedProduct => {
+      const product = allProducts.find(p => p.id === purchasedProduct.id);
+      return !product || product.stock < purchasedProduct.quantity;
+    });
+
+    if (outOfStock.length > 0) {
+      return res.status(400).json({ success: false, message: 'Vissa produkter finns inte i lager' });
+    }
+
     purchasedProducts.forEach((purchasedProduct) => {
       const product = allProducts.find(p => p.id === purchasedProduct.id);
       if (product) {
-        product.stock = Math.max(0, product.stock - purchasedProduct.quantity);
+        product.stock -= purchasedProduct.quantity;
       }
     });
 
     await writeProducts(allProducts);
+
     res.json({ success: true, message: 'Köp genomfört, lager uppdaterat' });
   } catch (err) {
-    next(err);
-  }
-});
-
-app.post('/update-inventory', async (req, res, next) => {
-  try {
-    const { productId, quantity } = req.body;
-    const products = await readProducts();
-
-    const product = products.find(p => p.id === productId);
-    if (product) {
-      product.stock = Math.max(0, product.stock - quantity);
-      await writeProducts(products);
-      res.json({ success: true, message: 'Lager uppdaterat' });
-    } else {
-      res.status(404).json({ success: false, message: 'Produkten hittades inte' });
-    }
-  } catch (err) {
-    console.error('Error updating inventory:', err);
+    console.error('Error during purchase:', err);
     next(err);
   }
 });

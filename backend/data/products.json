@@ -5,8 +5,8 @@
     "price": 1500,
     "isBestseller": true,
     "description": "Vår mest prisvärda ved, ett bra val för den som vill ha bra värde för pengarna. Pris per m³",
-    "stock": 25,
-    "inventory": -31
+    "stock": 20,
+    "inventory": 31
   },
   {
     "id": 2,
@@ -14,8 +14,8 @@
     "price": 1800,
     "isBestseller": false,
     "description": "En blandning av björk, ek och ask. Perfekt för kalla vinterkvällar och ger en behaglig doft. Pris per m³",
-    "stock": 10,
-    "inventory": -40
+    "stock": 15,
+    "inventory": 40
   },
   {
     "id": 3,
@@ -23,8 +23,8 @@
     "price": 2000,
     "isBestseller": false,
     "description": "Björkved av hög kvalitet, väljer du detta kan du inte gå fel. Pris per m³",
-    "stock": 12,
-    "inventory": -4
+    "stock": 25,
+    "inventory": 50
   },
   {
     "id": 4,
@@ -32,8 +32,8 @@
     "price": 2000,
     "isBestseller": true,
     "description": "Perfekt för en sommarkväll vid eldstaden eller eldkorgen. Pris per m³",
-    "stock": 15,
-    "inventory": -3
+    "stock": 6,
+    "inventory": 10
   },
   {
     "id": 5,
@@ -41,8 +41,8 @@
     "price": 2200,
     "isBestseller": false,
     "description": "En blandning av ask och björk, ger en jämn och fin brasa. Pris per m³",
-    "stock": 8,
-    "inventory": -7
+    "stock": 12,
+    "inventory": 20
   },
   {
     "id": 6,
@@ -51,6 +51,6 @@
     "isBestseller": true,
     "description": "Vår premium ekved ger mycket värme och har en lång brinntid. Pris per m³",
     "stock": 7,
-    "inventory": -9
+    "inventory": 15
   }
 ]

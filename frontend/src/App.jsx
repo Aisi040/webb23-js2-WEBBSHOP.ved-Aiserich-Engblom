@@ -10,7 +10,6 @@ import HomePage from './components/HomePage';
 import BackgroundImage from './components/BackgroundImage';
 import ContactPage from './components/ContactPage';
 import './style.css';
-import PropTypes from 'prop-types';
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -18,17 +17,17 @@ function App() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/products'); 
-        setProducts(response.data);
-      } catch (error) {
-        setError('Det gick inte att hämta produkterna');
-        console.error('Error fetching products:', error);
-      }
-    };
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/products'); 
+      setProducts(response.data);
+    } catch (error) {
+      setError('Det gick inte att hämta produkterna');
+      console.error('Error fetching products:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchProducts();
   }, []);
 
@@ -41,9 +40,30 @@ function App() {
     else setCart(cart.filter((_, i) => i !== index));
   };
 
-  const handleCheckout = () => {
-    alert('Köp genomfört!');
-    setCart([]); // Clear the cart after purchase
+  const handleCheckout = async () => {
+    try {
+      const productQuantities = cart.reduce((acc, product) => {
+        acc[product.id] = (acc[product.id] || 0) + 1;
+        return acc;
+      }, {});
+
+      const purchasedProducts = Object.keys(productQuantities).map(id => ({
+        id,
+        quantity: productQuantities[id]
+      }));
+
+      const response = await axios.post('http://localhost:3000/purchase', { products: purchasedProducts });
+      if (response.data.success) {
+        alert('Köp genomfört!');
+        setCart([]); // Clear the cart after purchase
+        fetchProducts(); // Fetch products again to update the stock
+      } else {
+        alert('Kunde inte genomföra köpet: ' + response.data.message);
+      }
+    } catch (error) {
+      console.error('Error during purchase:', error);
+      alert('Ett fel uppstod vid köp.');
+    }
   };
 
   const handleSearch = term => {
@@ -67,21 +87,12 @@ function App() {
         </Routes>
       </div>
       <div style={{ minHeight: '200px' }}>
-        {/*scrolling */}
+        {/* scrolling */}
       </div>
       <BackgroundImage />
       <Footer />
     </Router>
   );
 }
-
-App.propTypes = {
-  products: PropTypes.array,
-  cart: PropTypes.array,
-  error: PropTypes.string,
-  handleAddToCart: PropTypes.func,
-  handleRemoveFromCart: PropTypes.func,
-  handleCheckout: PropTypes.func,
-};
 
 export default App;
