@@ -2,7 +2,7 @@ import React from 'react';
 import Product from './Product';
 import PropTypes from 'prop-types';
 
-function Bestsellers({ products, onAddToCart, onUpdateStock }) {
+function Bestsellers({ products, onAddToCart }) {
   const bestsellers = products
     .filter(product => product.isBestseller)
     .slice(0, 3); // Hämta tre bästsäljande produkterna
@@ -24,7 +24,6 @@ function Bestsellers({ products, onAddToCart, onUpdateStock }) {
             <Product 
               product={product} 
               onAddToCart={onAddToCart} 
-              onUpdateStock={onUpdateStock}
               showStockInfo={false}  // Inte visa lagerinfo
             />
           </div>
@@ -37,7 +36,6 @@ function Bestsellers({ products, onAddToCart, onUpdateStock }) {
 Bestsellers.propTypes = {
   products: PropTypes.array.isRequired,
   onAddToCart: PropTypes.func.isRequired,
-  onUpdateStock: PropTypes.func.isRequired,
 };
 
 export default Bestsellers;

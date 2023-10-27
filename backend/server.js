@@ -7,13 +7,14 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3001', // Byt ut mot din frontend-serverns adress
+  origin: 'http://localhost:3001', // Uppdatera till din frontend-serverns adress
   methods: 'GET,POST',
   allowedHeaders: 'Content-Type'
 }));
 
 const productsFilePath = path.join(__dirname, 'data', 'products.json');
 
+// Funktion för att läsa produkter från JSON-filen
 async function readProducts() {
   try {
     const data = await fs.readFile(productsFilePath, 'utf8');
@@ -24,6 +25,7 @@ async function readProducts() {
   }
 }
 
+// Funktion för att skriva produkter till JSON-filen
 async function writeProducts(products) {
   try {
     await fs.writeFile(productsFilePath, JSON.stringify(products, null, 2));
@@ -33,10 +35,12 @@ async function writeProducts(products) {
   }
 }
 
+// Roten av din webbserver, ger ett välkomstmeddelande
 app.get('/', (req, res) => {
   res.send('Welcome to the webshop backend!');
 });
 
+// En endpoint för att hämta produkter, med möjlighet att filtrera med en sökterm
 app.get('/products', async (req, res, next) => {
   try {
     const { search } = req.query;
@@ -52,42 +56,36 @@ app.get('/products', async (req, res, next) => {
   }
 });
 
-app.post('/purchase', async (req, res, next) => {
+// En endpoint för att genomföra ett köp och uppdatera lagerstatus
+app.post('/update-inventory', async (req, res, next) => { // Ändra endpoint till /update-inventory
   try {
-    const { products: purchasedProducts } = req.body;
+    const { productId, quantity } = req.body; // Anpassa förväntad request body
     const allProducts = await readProducts();
 
-    const outOfStock = purchasedProducts.filter(purchasedProduct => {
-      const product = allProducts.find(p => p.id === purchasedProduct.id);
-      return !product || product.stock < purchasedProduct.quantity;
-    });
+    const product = allProducts.find(p => p.id === productId);
 
-    if (outOfStock.length > 0) {
-      return res.status(400).json({ success: false, message: 'Vissa produkter finns inte i lager' });
+    if (!product || product.stock < quantity) {
+      return res.status(400).json({ success: false, message: 'Produkten finns inte i lager eller tillräckligt med lager' });
     }
 
-    purchasedProducts.forEach((purchasedProduct) => {
-      const product = allProducts.find(p => p.id === purchasedProduct.id);
-      if (product) {
-        product.stock -= purchasedProduct.quantity;
-      }
-    });
+    product.stock -= quantity;
 
     await writeProducts(allProducts);
 
-    res.json({ success: true, message: 'Köp genomfört, lager uppdaterat' });
+    res.json({ success: true, message: 'Lager uppdaterat' });
   } catch (err) {
-    console.error('Error during purchase:', err);
+    console.error('Error updating inventory:', err);
     next(err);
   }
 });
 
+// Middleware för att hantera fel och skicka felmeddelanden till klienten
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: 'Something broke on the server', error: err.message });
+  res.status(500).json({ message: 'Något gick fel på servern', error: err.message });
 });
 
 const port = 3000;
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Servern körs på port ${port}`);
 });

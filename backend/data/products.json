@@ -5,7 +5,7 @@
     "price": 1500,
     "isBestseller": true,
     "description": "Vår mest prisvärda ved, ett bra val för den som vill ha bra värde för pengarna. Pris per m³",
-    "stock": 11,
+    "stock": 9,
     "inventory": 31
   },
   {
@@ -32,7 +32,7 @@
     "price": 2000,
     "isBestseller": true,
     "description": "Perfekt för en sommarkväll vid eldstaden eller eldkorgen. Pris per m³",
-    "stock": 4,
+    "stock": 1,
     "inventory": 10
   },
   {
@@ -50,7 +50,7 @@
     "price": 2400,
     "isBestseller": true,
     "description": "Vår premium ekved ger mycket värme och har en lång brinntid. Pris per m³",
-    "stock": 7,
+    "stock": 4,
     "inventory": 15
   }
 ]
