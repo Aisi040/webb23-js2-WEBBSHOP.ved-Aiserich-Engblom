@@ -9,7 +9,7 @@
   }
   
   .card-img-top {
-    height: 200px; /* eller den höjd du föredrar */
+    height: 200px; 
     object-fit: cover;
   }
   

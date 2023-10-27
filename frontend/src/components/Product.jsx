@@ -4,8 +4,10 @@ import axios from 'axios';
 
 import './Product.css';
 
+const IMAGE_BASE_URL = process.env.PUBLIC_URL + '/Bilder/';
+
 function Product({ product, onAddToCart, showStockInfo }) {
-  const imageUrl = product.image || 'standard-bild-url'; // Ersätt 'standard-bild-url' med den faktiska URL:en till din standardbild
+  const imageUrl = `${IMAGE_BASE_URL}${product.image}`;
   const [addingToCart, setAddingToCart] = useState(false);
   const [stock, setStock] = useState(product.stock);
 
@@ -33,6 +35,8 @@ function Product({ product, onAddToCart, showStockInfo }) {
   };
 
   return (
+
+    
     <div className="card h-100">
       <img
         src={imageUrl}
