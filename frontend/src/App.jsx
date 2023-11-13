@@ -34,6 +34,11 @@ function App() {
 
     const ws = new WebSocket('ws://localhost:3000');
 
+
+    ws.onopen = () => {
+      console.log('WebSocket connection opened successfully');
+    };
+
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
       if (message.type === 'update' && message.products) {

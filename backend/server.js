@@ -59,16 +59,20 @@ app.get('/products', async (req, res, next) => {
 app.post('/complete-purchase', async (req, res, next) => {
   try {
     const { productQuantities } = req.body;
-    console.log("Received product quantities:", productQuantities);  // Debugging-loggning
+    console.log("Received product quantities:", productQuantities);
 
     const allProducts = await readProducts();
+    const updatedProducts = [];
 
     Object.entries(productQuantities).forEach(([productId, quantity]) => {
       const product = allProducts.find(p => p.id === productId);
       if (product && product.stock >= quantity) {
-        console.log(`Updating stock for product ${productId}: ${product.stock} - ${quantity}`); // Före uppdatering
+        console.log(`Updating stock for product ${productId}: ${product.stock} - ${quantity}`);
         product.stock -= quantity;
-        console.log(`New stock for product ${productId}: ${product.stock}`); // Efter uppdatering
+        console.log(`New stock for product ${productId}: ${product.stock}`);
+        updatedProducts.push(product);
+      } else if (product) {
+        console.error(`Insufficient stock for product ${productId}: available ${product.stock}, requested ${quantity}`);
       }
     });
 
@@ -76,7 +80,7 @@ app.post('/complete-purchase', async (req, res, next) => {
 
     wss.clients.forEach(client => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ type: 'update', products: allProducts }));
+        client.send(JSON.stringify({ type: 'update', products: updatedProducts }));
       }
     });
 
