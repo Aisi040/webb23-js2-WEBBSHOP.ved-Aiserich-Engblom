@@ -32,7 +32,7 @@ function App() {
 
     fetchProducts();
 
-    let ws; // Flytta ws deklaration hit
+    let ws; 
 
     const connectWebSocket = () => {
       ws = new WebSocket('ws://localhost:3000');
