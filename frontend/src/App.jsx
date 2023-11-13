@@ -19,17 +19,18 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('lowest');
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/products');
-        setProducts(response.data);
-      } catch (error) {
-        setError('Det gick inte att hämta produkterna');
-        console.error('Error fetching products:', error);
-      }
-    };
+  // Flytta fetchProducts utanför useEffect
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/products');
+      setProducts(response.data);
+    } catch (error) {
+      setError('Det gick inte att hämta produkterna');
+      console.error('Error fetching products:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchProducts();
 
     let ws; 
@@ -50,7 +51,7 @@ function App() {
 
       ws.onclose = () => {
         console.log('WebSocket closed. Attempting to reconnect...');
-        setTimeout(connectWebSocket, 3000); // Försök att återansluta efter 3 sekunder
+        setTimeout(connectWebSocket, 3000);
       };
     };
 
@@ -91,10 +92,7 @@ function App() {
         alert('Köp genomfört!');
         setCart([]);
 
-        setProducts(prevProducts => prevProducts.map(product => {
-          const count = productQuantities[product.id] || 0;
-          return { ...product, stock: Math.max(product.stock - count, 0) };
-        }));
+        fetchProducts(); // Hämta de uppdaterade produkterna efter köpet
       }
     } catch (error) {
       console.error('Error completing purchase:', error);

@@ -15,7 +15,7 @@
     "price": 2100,
     "isBestseller": false,
     "description": "En blandning av björk, ek och ask. Perfekt för kalla vinterkvällar och ger en behaglig doft. Pris per m³",
-    "stock": 4,
+    "stock": 3,
     "inventory": 40,
     "image": "produkt2.png"
   },
@@ -25,7 +25,7 @@
     "price": 2400,
     "isBestseller": false,
     "description": "Björkved av hög kvalitet, väljer du detta kan du inte gå fel. Pris per m³",
-    "stock": 7,
+    "stock": 0,
     "inventory": 50,
     "image": "produkt3.png"
   },
@@ -55,7 +55,7 @@
     "price": 2400,
     "isBestseller": true,
     "description": "Vår premium ekved ger mycket värme och har en lång brinntid. Pris per m³",
-    "stock": 13,
+    "stock": 9,
     "inventory": 15,
     "image": "produkt6.png"
   }
