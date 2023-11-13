@@ -11,7 +11,7 @@ const wss = new WebSocket.Server({ server });
 
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3001', // Uppdatera till din frontend-serverns adress
+  origin: 'http://localhost:3001',
   methods: 'GET,POST',
   allowedHeaders: 'Content-Type'
 }));
@@ -30,6 +30,7 @@ async function readProducts() {
 
 async function writeProducts(products) {
   try {
+    console.log('Writing products to file:', products);
     await fs.writeFile(productsFilePath, JSON.stringify(products, null, 2));
   } catch (err) {
     console.error('Error writing products file:', err);
@@ -43,8 +44,8 @@ app.get('/', (req, res) => {
 
 app.get('/products', async (req, res, next) => {
   try {
-    const { search } = req.query;
     const products = await readProducts();
+    const { search } = req.query;
     const filteredProducts = search
       ? products.filter((product) =>
           product.name.toLowerCase().includes(search.toLowerCase())
@@ -62,24 +63,18 @@ app.post('/complete-purchase', async (req, res, next) => {
     console.log("Received product quantities:", productQuantities);
 
     const allProducts = await readProducts();
-
     let isStockUpdated = false;
 
     Object.entries(productQuantities).forEach(([productId, quantity]) => {
-      const product = allProducts.find(p => p.id === productId);
-      if (product && product.stock >= quantity) {
-        console.log(`Updating stock for product ${productId}: ${product.stock} - ${quantity}`);
-        product.stock -= quantity;
-        console.log(`New stock for product ${productId}: ${product.stock}`);
+      const productIndex = allProducts.findIndex(p => p.id === Number(productId));
+      if (productIndex !== -1 && allProducts[productIndex].stock >= quantity) {
+        allProducts[productIndex].stock -= quantity;
         isStockUpdated = true;
-      } else if (product) {
-        console.error(`Insufficient stock for product ${productId}: available ${product.stock}, requested ${quantity}`);
       }
     });
 
     if (isStockUpdated) {
       await writeProducts(allProducts);
-
       wss.clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify({ type: 'update', products: allProducts }));

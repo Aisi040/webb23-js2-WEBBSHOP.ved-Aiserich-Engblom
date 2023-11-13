@@ -15,7 +15,7 @@
     "price": 2100,
     "isBestseller": false,
     "description": "En blandning av björk, ek och ask. Perfekt för kalla vinterkvällar och ger en behaglig doft. Pris per m³",
-    "stock": 2,
+    "stock": 0,
     "inventory": 40,
     "image": "produkt2.png"
   },
@@ -35,7 +35,7 @@
     "price": 2000,
     "isBestseller": true,
     "description": "Perfekt för en sommarkväll vid eldstaden eller eldkorgen. Pris per m³",
-    "stock": 5,
+    "stock": 4,
     "inventory": 10,
     "image": "produkt4.png"
   },
