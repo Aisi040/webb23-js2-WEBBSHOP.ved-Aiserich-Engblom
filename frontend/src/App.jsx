@@ -32,19 +32,29 @@ function App() {
 
     fetchProducts();
 
-    const ws = new WebSocket('ws://localhost:3000');
+    let ws; // Flytta ws deklaration hit
 
+    const connectWebSocket = () => {
+      ws = new WebSocket('ws://localhost:3000');
 
-    ws.onopen = () => {
-      console.log('WebSocket connection opened successfully');
+      ws.onopen = () => {
+        console.log('WebSocket connection opened successfully');
+      };
+
+      ws.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        if (message.type === 'update' && message.products) {
+          setProducts(message.products);
+        }
+      };
+
+      ws.onclose = () => {
+        console.log('WebSocket closed. Attempting to reconnect...');
+        setTimeout(connectWebSocket, 3000); // Försök att återansluta efter 3 sekunder
+      };
     };
 
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.type === 'update' && message.products) {
-        setProducts(message.products);
-      }
-    };
+    connectWebSocket();
 
     return () => {
       if (ws) {
