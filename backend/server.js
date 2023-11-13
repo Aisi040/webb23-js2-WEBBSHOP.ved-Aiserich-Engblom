@@ -62,7 +62,8 @@ app.post('/complete-purchase', async (req, res, next) => {
     console.log("Received product quantities:", productQuantities);
 
     const allProducts = await readProducts();
-    const updatedProducts = [];
+
+    let isStockUpdated = false;
 
     Object.entries(productQuantities).forEach(([productId, quantity]) => {
       const product = allProducts.find(p => p.id === productId);
@@ -70,21 +71,25 @@ app.post('/complete-purchase', async (req, res, next) => {
         console.log(`Updating stock for product ${productId}: ${product.stock} - ${quantity}`);
         product.stock -= quantity;
         console.log(`New stock for product ${productId}: ${product.stock}`);
-        updatedProducts.push(product);
+        isStockUpdated = true;
       } else if (product) {
         console.error(`Insufficient stock for product ${productId}: available ${product.stock}, requested ${quantity}`);
       }
     });
 
-    await writeProducts(allProducts);
+    if (isStockUpdated) {
+      await writeProducts(allProducts);
 
-    wss.clients.forEach(client => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ type: 'update', products: updatedProducts }));
-      }
-    });
+      wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({ type: 'update', products: allProducts }));
+        }
+      });
 
-    res.json({ success: true, message: 'Köp genomfört och lager uppdaterat' });
+      res.json({ success: true, message: 'Köp genomfört och lager uppdaterat' });
+    } else {
+      res.status(400).json({ success: false, message: 'Otillräckligt lager för vissa produkter' });
+    }
   } catch (err) {
     console.error('Error completing purchase:', err);
     next(err);
