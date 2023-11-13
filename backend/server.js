@@ -2,8 +2,12 @@ const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const cors = require('cors');
+const WebSocket = require('ws');
+const http = require('http');
 
 const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
 app.use(express.json());
 app.use(cors({
@@ -14,7 +18,6 @@ app.use(cors({
 
 const productsFilePath = path.join(__dirname, 'data', 'products.json');
 
-// Funktion för att läsa produkter från JSON-filen
 async function readProducts() {
   try {
     const data = await fs.readFile(productsFilePath, 'utf8');
@@ -25,7 +28,6 @@ async function readProducts() {
   }
 }
 
-// Funktion för att skriva produkter till JSON-filen
 async function writeProducts(products) {
   try {
     await fs.writeFile(productsFilePath, JSON.stringify(products, null, 2));
@@ -35,12 +37,10 @@ async function writeProducts(products) {
   }
 }
 
-// Roten av din webbserver, ger ett välkomstmeddelande
 app.get('/', (req, res) => {
   res.send('Welcome to the webshop backend!');
 });
 
-// En endpoint för att hämta produkter, med möjlighet att filtrera med en sökterm
 app.get('/products', async (req, res, next) => {
   try {
     const { search } = req.query;
@@ -56,36 +56,43 @@ app.get('/products', async (req, res, next) => {
   }
 });
 
-// En endpoint för att genomföra ett köp och uppdatera lagerstatus
-app.post('/update-inventory', async (req, res, next) => { // Ändra endpoint till /update-inventory
+app.post('/complete-purchase', async (req, res, next) => {
   try {
-    const { productId, quantity } = req.body; // Anpassa förväntad request body
+    const { productQuantities } = req.body;
+    console.log("Received product quantities:", productQuantities);  // Debugging-loggning
+
     const allProducts = await readProducts();
 
-    const product = allProducts.find(p => p.id === productId);
-
-    if (!product || product.stock < quantity) {
-      return res.status(400).json({ success: false, message: 'Produkten finns inte i lager eller tillräckligt med lager' });
-    }
-
-    product.stock -= quantity;
+    Object.entries(productQuantities).forEach(([productId, quantity]) => {
+      const product = allProducts.find(p => p.id === productId);
+      if (product && product.stock >= quantity) {
+        console.log(`Updating stock for product ${productId}: ${product.stock} - ${quantity}`); // Före uppdatering
+        product.stock -= quantity;
+        console.log(`New stock for product ${productId}: ${product.stock}`); // Efter uppdatering
+      }
+    });
 
     await writeProducts(allProducts);
 
-    res.json({ success: true, message: 'Lager uppdaterat' });
+    wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({ type: 'update', products: allProducts }));
+      }
+    });
+
+    res.json({ success: true, message: 'Köp genomfört och lager uppdaterat' });
   } catch (err) {
-    console.error('Error updating inventory:', err);
+    console.error('Error completing purchase:', err);
     next(err);
   }
 });
 
-// Middleware för att hantera fel och skicka felmeddelanden till klienten
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Något gick fel på servern', error: err.message });
 });
 
 const port = 3000;
-app.listen(port, () => {
-  console.log(`Servern körs på port ${port}`);
+server.listen(port, () => {
+  console.log(`Servern körs på port ${port} med WebSocket-stöd`);
 });

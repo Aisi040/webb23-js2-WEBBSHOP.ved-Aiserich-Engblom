@@ -22,7 +22,7 @@ function App() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/products'); 
+        const response = await axios.get('http://localhost:3000/products');
         setProducts(response.data);
       } catch (error) {
         setError('Det gick inte att hämta produkterna');
@@ -31,20 +31,60 @@ function App() {
     };
 
     fetchProducts();
+
+    const ws = new WebSocket('ws://localhost:3000');
+
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === 'update' && message.products) {
+        setProducts(message.products);
+      }
+    };
+
+    return () => {
+      if (ws) {
+        ws.close();
+      }
+    };
   }, []);
 
   const handleAddToCart = product => {
-    setCart([...cart, product]);
+    const countInCart = cart.filter(item => item.id === product.id).length;
+
+    if (countInCart < product.stock) {
+      setCart([...cart, product]);
+    } else {
+      alert('Det finns inte tillräckligt många av denna produkt i lager för att lägga till fler.');
+    }
   };
 
   const handleRemoveFromCart = index => {
-    if (index === -1) setCart([]); // Clear the entire cart
+    if (index === -1) setCart([]); 
     else setCart(cart.filter((_, i) => i !== index));
   };
 
-  const handleCheckout = () => {
-    alert('Köp genomfört!');
-    setCart([]); // Clear the cart after purchase
+  const handleCheckout = async () => {
+    try {
+      const productQuantities = cart.reduce((acc, product) => {
+        acc[product.id] = (acc[product.id] || 0) + 1;
+        return acc;
+      }, {});
+
+      const response = await axios.post('http://localhost:3000/complete-purchase', { productQuantities });
+
+      if (response.status === 200) {
+        alert('Köp genomfört!');
+        setCart([]);
+
+        setProducts(prevProducts => prevProducts.map(product => {
+          const count = productQuantities[product.id] || 0;
+          return { ...product, stock: Math.max(product.stock - count, 0) };
+        }));
+      }
+    } catch (error) {
+      console.error('Error completing purchase:', error);
+      alert('Ett fel uppstod vid köpet.');
+    }
   };
 
   const handleSearch = term => {
@@ -56,7 +96,7 @@ function App() {
   };
 
   const filteredAndSortedProducts = products
-    .filter(product => 
+    .filter(product =>
       product.name.toLowerCase().includes(searchTerm) ||
       product.description.toLowerCase().includes(searchTerm)
     )

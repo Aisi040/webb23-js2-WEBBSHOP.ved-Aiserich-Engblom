@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 
 import './Product.css';
 
@@ -9,41 +8,21 @@ const IMAGE_BASE_URL = process.env.PUBLIC_URL + '/Bilder/';
 function Product({ product, onAddToCart, showStockInfo }) {
   const imageUrl = `${IMAGE_BASE_URL}${product.image}`;
   const [addingToCart, setAddingToCart] = useState(false);
-  const [stock, setStock] = useState(product.stock);
 
-  useEffect(() => {
-    setStock(product.stock);
-  }, [product.stock]);
-
-  const addToCart = async () => {
-    try {
-      setAddingToCart(true);
-      const result = await axios.post('http://localhost:3000/update-inventory', {
-        productId: product.id,
-        quantity: 1,
-      });
-      if (result.status === 200) {
-        onAddToCart(product);
-        const newStock = stock - 1;
-        setStock(newStock);
-      }
-      setAddingToCart(false);
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      setAddingToCart(false);
-    }
+  const addToCart = () => {
+    setAddingToCart(true);
+    onAddToCart(product);
+    setAddingToCart(false);
   };
 
   return (
-
-    
     <div className="card h-100">
       <img
         src={imageUrl}
         alt={product.name}
         className="card-img-top"
         onError={(e) => {
-          e.target.src = 'fallback-image-url'; // Ersätt 'fallback-image-url' med den faktiska URL:en till din fallback-bild
+          e.target.src = 'fallback-image-url';
           e.target.alt = 'Bild saknas';
         }}
       />
@@ -58,11 +37,11 @@ function Product({ product, onAddToCart, showStockInfo }) {
         <p className="card-text">
           <strong>{product.price} kr</strong>
         </p>
-        {stock > 0 ? (
+        {product.stock > 0 ? (
           <div>
             {showStockInfo && (
               <p className="card-text">
-                Antal i lager: {stock}
+                Antal i lager: {product.stock}
               </p>
             )}
             <button
@@ -82,7 +61,7 @@ function Product({ product, onAddToCart, showStockInfo }) {
               className="btn btn-secondary mt-2"
               disabled={true}
             >
-              Lägg till i kundvagn
+              Slut i lager
             </button>
           </div>
         )}
